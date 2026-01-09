@@ -9,7 +9,7 @@
 
 A comprehensive, free, and open-source Coast FIRE calculator that helps you understand when you've saved enough to stop contributing to retirement accounts. Your existing investments will grow to cover your retirement needs—you just need to work enough to cover current expenses.
 
-[**🚀 Try the Live Calculator**](https://joanpalin.github.io/coast-fire-calculator/) | [**📚 Read the Complete Guide**](docs/) | [**💬 Join Discussion**](https://github.com/joanpalin/coast-fire-calculator/discussions)
+[**🚀 Try the Live Calculator**](https://joanpalin.github.io/Coast-Fire-Calculator/) | [**📚 Read the Complete Guide**](docs/) | [**💬 Join Discussion**](https://github.com/joanpalin/coast-fire-calculator/discussions)
 
 ---
 
