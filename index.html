@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Free Coast FIRE Calculator - Calculate when you can stop saving for retirement and let compound interest do the rest. Interactive charts, detailed projections, and comprehensive FIRE education.">
+    <meta name="keywords" content="Coast FIRE, FIRE calculator, financial independence, early retirement, compound interest, retirement calculator">
+    <meta name="author" content="Coast FIRE Calculator">
+    
+    <!-- Open Graph / Social Media -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://joanpalin.github.io/coast-fire-calculator/">
+    <meta property="og:title" content="Coast FIRE Calculator - Calculate Your Path to Financial Freedom">
+    <meta property="og:description" content="Free calculator to determine when you can stop saving for retirement. Interactive charts, detailed projections, and comprehensive FIRE education.">
+    
+    <title>Coast FIRE Calculator - Calculate Your Path to Financial Freedom</title>
+    
+    <!-- Chart.js for charts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: linear-gradient(to bottom right, #eff6ff, #eef2ff);
+            border-radius: 12px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            padding: 32px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #312e81;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            color: #6b7280;
+        }
+
+        .header .links {
+            margin-top: 16px;
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .header .links a {
+            color: #6366f1;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .header .links a:hover {
+            text-decoration: underline;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: white;
+            padding: 24px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .card h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #3730a3;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .input-group {
+            margin-bottom: 16px;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 4px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 10px 16px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #6366f1;
+            ring: 2px;
+            ring-color: #6366f1;
+        }
+
+        .input-hint {
+            font-size: 0.75rem;
+            color: #6b7280;
+            margin-top: 4px;
+        }
+
+        .status-box {
+            padding: 24px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            border: 2px solid;
+        }
+
+        .status-box.success {
+            background-color: #d1fae5;
+            border-color: #10b981;
+        }
+
+        .status-box.warning {
+            background-color: #fed7aa;
+            border-color: #f97316;
+        }
+
+        .status-title {
+            font-size: 1.25rem;
+            font-weight: bold;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-title.success {
+            color: #047857;
+        }
+
+        .status-title.warning {
+            color: #c2410c;
+        }
+
+        .key-numbers {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .key-number-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background-color: #dbeafe;
+            border-radius: 6px;
+        }
+
+        .key-number-row.highlight {
+            background-color: #e9d5ff;
+        }
+
+        .key-number-row.amber {
+            background-color: #fef3c7;
+            border: 1px solid #f59e0b;
+        }
+
+        .key-number-label {
+            color: #374151;
+        }
+
+        .key-number-value {
+            font-weight: bold;
+            color: #312e81;
+        }
+
+        .chart-container {
+            background: white;
+            padding: 24px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            margin-bottom: 24px;
+        }
+
+        .chart-wrapper {
+            position: relative;
+            height: 400px;
+        }
+
+        .table-container {
+            background: white;
+            padding: 24px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            margin-bottom: 24px;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.75rem;
+        }
+
+        thead {
+            background-color: #c7d2fe;
+            position: sticky;
+            top: 0;
+        }
+
+        th {
+            padding: 12px 16px;
+            text-align: left;
+            font-weight: 600;
+            color: #312e81;
+        }
+
+        td {
+            padding: 8px 16px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        tbody tr:nth-child(even) {
+            background-color: #f9fafb;
+        }
+
+        tbody tr.retirement-row {
+            background-color: #f3e8ff;
+            font-weight: 600;
+        }
+
+        tbody tr.stop-row {
+            background-color: #fef3c7;
+        }
+
+        .notes {
+            background-color: #dbeafe;
+            border-left: 4px solid #3b82f6;
+            padding: 16px;
+            border-radius: 4px;
+        }
+
+        .notes h3 {
+            font-weight: 600;
+            color: #1e3a8a;
+            margin-bottom: 8px;
+        }
+
+        .notes ul {
+            margin-left: 20px;
+            color: #374151;
+        }
+
+        .notes li {
+            margin-bottom: 4px;
+            font-size: 0.875rem;
+        }
+
+        .info-box {
+            background-color: #dbeafe;
+            padding: 16px;
+            border-radius: 8px;
+            margin-top: 16px;
+        }
+
+        .info-box h3 {
+            font-weight: 600;
+            color: #312e81;
+            margin-bottom: 8px;
+        }
+
+        .info-box p {
+            font-size: 0.875rem;
+            color: #374151;
+        }
+
+        .divider {
+            border-top: 2px solid #d1d5db;
+            margin: 12px 0;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 24px;
+            border-top: 2px solid #d1d5db;
+            color: #6b7280;
+            font-size: 0.875rem;
+        }
+
+        .footer a {
+            color: #6366f1;
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 Coast FIRE Calculator</h1>
+            <p>Calculate when you can stop saving and let your investments grow to retirement</p>
+            <div class="links">
+                <a href="docs/" target="_blank">📚 Read the Complete Guide</a>
+                <span>•</span>
+                <a href="https://github.com/joanpalin/coast-fire-calculator" target="_blank">⭐ Star on GitHub</a>
+                <span>•</span>
+                <a href="docs/faq.md" target="_blank">❓ FAQ</a>
+            </div>
+        </div>
+
+        <div class="grid">
+            <!-- Input Section -->
+            <div class="card">
+                <h2>💰 Your Information</h2>
+                
+                <div class="input-group">
+                    <label for="currentAge">Current Age</label>
+                    <input type="number" id="currentAge" value="35">
+                </div>
+
+                <div class="input-group">
+                    <label for="retirementAge">Target Retirement Age</label>
+                    <input type="number" id="retirementAge" value="65">
+                </div>
+
+                <div class="input-group">
+                    <label for="currentSavings">Current Retirement Savings ($)</label>
+                    <input type="number" id="currentSavings" value="150000">
+                </div>
+
+                <div class="input-group">
+                    <label for="monthlyContribution">Monthly Contribution ($)</label>
+                    <input type="number" id="monthlyContribution" value="0">
+                    <div class="input-hint">Set to 0 for pure Coast FIRE calculation</div>
+                </div>
+
+                <div class="input-group" id="stopAgeGroup" style="display: none;">
+                    <label for="stopContributionAge">Stop Contributing At Age</label>
+                    <input type="number" id="stopContributionAge" value="65">
+                    <div class="input-hint" id="coastingYears"></div>
+                </div>
+
+                <div class="input-group">
+                    <label for="annualExpenses">Expected Annual Expenses in Retirement ($)</label>
+                    <input type="number" id="annualExpenses" value="40000">
+                </div>
+
+                <div class="input-group">
+                    <label for="annualReturn">Expected Annual Return (%)</label>
+                    <input type="number" step="0.1" id="annualReturn" value="7">
+                </div>
+
+                <div class="input-group">
+                    <label for="inflationRate">Expected Inflation Rate (%)</label>
+                    <input type="number" step="0.1" id="inflationRate" value="2.5">
+                </div>
+
+                <div class="input-group">
+                    <label for="safeWithdrawalRate">Safe Withdrawal Rate (%)</label>
+                    <input type="number" step="0.1" id="safeWithdrawalRate" value="4">
+                </div>
+            </div>
+
+            <!-- Results Section -->
+            <div>
+                <div id="statusBox" class="status-box"></div>
+
+                <div class="card">
+                    <h2>📊 Key Numbers</h2>
+                    <div id="keyNumbers" class="key-numbers"></div>
+                </div>
+
+                <div class="info-box">
+                    <h3>📅 What is Coast FIRE?</h3>
+                    <p>Coast FIRE means you have enough invested that you can stop contributing to retirement savings. Your current portfolio will grow (through compound returns) to fully support your retirement. You only need to work to cover current living expenses.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chart Section -->
+        <div class="chart-container">
+            <h2>📈 Portfolio Growth Projection</h2>
+            <p style="color: #6b7280; font-size: 0.875rem; margin-bottom: 16px;">All values shown are inflation-adjusted (in today's dollars). Chart extends 10 years into retirement to show portfolio sustainability with withdrawals.</p>
+            <div class="chart-wrapper">
+                <canvas id="portfolioChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Table Section -->
+        <div class="table-container">
+            <h2>📋 Year-by-Year Projection</h2>
+            <p style="color: #6b7280; font-size: 0.875rem; margin-bottom: 16px;">All values shown are inflation-adjusted (in today's dollars). Projection extends 10 years into retirement showing portfolio behavior with annual withdrawals.</p>
+            <table id="projectionTable">
+                <thead>
+                    <tr>
+                        <th>Age</th>
+                        <th>Year</th>
+                        <th style="text-align: right;">Portfolio Value (Today's $)</th>
+                        <th style="text-align: right;">Portfolio Value (Nominal)</th>
+                        <th style="text-align: right;">Difference</th>
+                        <th style="text-align: right;">Total Contributed</th>
+                        <th style="text-align: right;">Investment Growth (Today's $)</th>
+                        <th style="text-align: right;">Annual Income 4% (Today's $)</th>
+                        <th style="text-align: right;">Annual Income 4% (Nominal)</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                </tbody>
+            </table>
+            
+            <div style="margin-top: 16px; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 12px; font-size: 0.75rem;">
+                <div style="padding: 8px; background-color: #dbeafe; border-radius: 4px;">
+                    <strong>Legend:</strong>
+                    <div>🎯 = Retirement Age</div>
+                    <div>⚡ = Stop Contributing</div>
+                    <div>🏖️ = Retirement Years (with withdrawals)</div>
+                </div>
+                <div style="padding: 8px; background-color: #fef3c7; border-radius: 4px;">
+                    <strong style="color: #f59e0b;">Difference:</strong>
+                    <div>Inflation impact (Nominal - Today's $)</div>
+                </div>
+                <div style="padding: 8px; background-color: #dbeafe; border-radius: 4px;">
+                    <strong style="color: #6366f1;">Total Contributed:</strong>
+                    <div>Sum of all monthly contributions</div>
+                </div>
+                <div style="padding: 8px; background-color: #d1fae5; border-radius: 4px;">
+                    <strong style="color: #10b981;">Investment Growth:</strong>
+                    <div>Returns from compound interest</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Notes -->
+        <div class="notes">
+            <h3>💡 Important Notes:</h3>
+            <ul>
+                <li>This calculator uses real returns (adjusted for inflation) for projections</li>
+                <li>The 4% safe withdrawal rate is a common rule of thumb but may need adjustment based on your situation</li>
+                <li>Consider factors like healthcare costs, taxes, and sequence of returns risk</li>
+                <li>Market returns vary significantly year-to-year; these are long-term averages</li>
+                <li>This calculator is for educational purposes only - consult with a financial adviser for personalized advice</li>
+                <li><strong>Privacy Notice:</strong> All calculations happen in your browser. No data is collected or sent to any server.</li>
+            </ul>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>Made with ❤️ for the FIRE community</p>
+            <p style="margin-top: 8px;">
+                <a href="https://github.com/joanpalin/coast-fire-calculator">View on GitHub</a> • 
+                <a href="docs/">Documentation</a> • 
+                <a href="https://github.com/joanpalin/coast-fire-calculator/issues">Report Issue</a>
+            </p>
+            <p style="margin-top: 8px; font-size: 0.75rem;">
+                Licensed under MIT • © 2025
+            </p>
+        </div>
+    </div>
+
+    <script>
+        let myChart = null;
+
+        function formatCurrency(value) {
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0,
+            }).format(value);
+        }
+
+        function calculate() {
+            // Get inputs
+            const currentAge = parseInt(document.getElementById('currentAge').value) || 0;
+            const retirementAge = parseInt(document.getElementById('retirementAge').value) || 65;
+            const currentSavings = parseFloat(document.getElementById('currentSavings').value) || 0;
+            const monthlyContribution = parseFloat(document.getElementById('monthlyContribution').value) || 0;
+            const stopContributionAge = parseInt(document.getElementById('stopContributionAge').value) || retirementAge;
+            const annualExpenses = parseFloat(document.getElementById('annualExpenses').value) || 0;
+            const annualReturn = parseFloat(document.getElementById('annualReturn').value) || 7;
+            const inflationRate = parseFloat(document.getElementById('inflationRate').value) || 2.5;
+            const safeWithdrawalRate = parseFloat(document.getElementById('safeWithdrawalRate').value) || 4;
+
+            // Show/hide stop age input
+            const stopAgeGroup = document.getElementById('stopAgeGroup');
+            if (monthlyContribution > 0) {
+                stopAgeGroup.style.display = 'block';
+                const coastingYears = retirementAge - stopContributionAge;
+                document.getElementById('coastingYears').textContent = 
+                    stopContributionAge < retirementAge ? 
+                    `Age when you'll stop monthly contributions and start coasting (${coastingYears} years of coasting)` :
+                    'Age when you\'ll stop monthly contributions and start coasting';
+            } else {
+                stopAgeGroup.style.display = 'none';
+            }
+
+            // Calculations
+            const yearsToRetirement = retirementAge - currentAge;
+            const realReturn = ((1 + annualReturn / 100) / (1 + inflationRate / 100) - 1) * 100;
+            const monthlyRealReturn = Math.pow(1 + realReturn / 100, 1/12) - 1;
+            const monthsToRetirement = yearsToRetirement * 12;
+
+            const yearsUntilStopContribution = Math.max(0, Math.min(stopContributionAge - currentAge, yearsToRetirement));
+            const monthsUntilStopContribution = yearsUntilStopContribution * 12;
+
+            // Calculate portfolio at stop age
+            let portfolioAtStopAge = currentSavings;
+            if (monthlyContribution > 0 && monthsUntilStopContribution > 0) {
+                portfolioAtStopAge = currentSavings * Math.pow(1 + monthlyRealReturn, monthsUntilStopContribution) +
+                    monthlyContribution * ((Math.pow(1 + monthlyRealReturn, monthsUntilStopContribution) - 1) / monthlyRealReturn);
+            } else if (monthsUntilStopContribution > 0) {
+                portfolioAtStopAge = currentSavings * Math.pow(1 + realReturn / 100, yearsUntilStopContribution);
+            }
+
+            const yearsAfterStopContribution = yearsToRetirement - yearsUntilStopContribution;
+            const futureValueWithStopAge = portfolioAtStopAge * Math.pow(1 + realReturn / 100, yearsAfterStopContribution);
+
+            const futureValueNoContributions = currentSavings * Math.pow(1 + realReturn / 100, yearsToRetirement);
+
+            const requiredPortfolio = annualExpenses / (safeWithdrawalRate / 100);
+
+            const coastFIRETarget = requiredPortfolio / Math.pow(1 + realReturn / 100, yearsToRetirement);
+            const hasReachedCoastFIRE = currentSavings >= coastFIRETarget;
+            const percentageOfCoastFIRE = (currentSavings / coastFIRETarget) * 100;
+
+            const totalContributionsToStop = monthlyContribution * monthsUntilStopContribution;
+
+            // Update status box
+            const statusBox = document.getElementById('statusBox');
+            if (hasReachedCoastFIRE) {
+                statusBox.className = 'status-box success';
+                statusBox.innerHTML = `
+                    <div class="status-title success">🎉 You've reached Coast FIRE!</div>
+                    <p style="color: #374151;">You can stop contributing to retirement and your current savings will grow to cover your retirement needs.</p>
+                `;
+            } else {
+                statusBox.className = 'status-box warning';
+                statusBox.innerHTML = `
+                    <div class="status-title warning">Not quite there yet</div>
+                    <p style="color: #374151; margin-bottom: 8px;">You're ${percentageOfCoastFIRE.toFixed(1)}% of the way to Coast FIRE</p>
+                    <p style="color: #374151;">You need an additional <strong style="color: #c2410c;">${formatCurrency(coastFIRETarget - currentSavings)}</strong> to reach Coast FIRE today</p>
+                `;
+            }
+
+            // Update key numbers
+            let keyNumbersHTML = `
+                <div class="key-number-row">
+                    <span class="key-number-label">Years to Retirement:</span>
+                    <span class="key-number-value">${yearsToRetirement} years</span>
+                </div>
+                <div class="key-number-row">
+                    <span class="key-number-label">Real Return Rate:</span>
+                    <span class="key-number-value">${realReturn.toFixed(2)}%</span>
+                </div>
+                <div class="key-number-row">
+                    <span class="key-number-label">Coast FIRE Target (Today):</span>
+                    <span class="key-number-value">${formatCurrency(coastFIRETarget)}</span>
+                </div>
+                <div class="key-number-row">
+                    <span class="key-number-label">Your Current Savings:</span>
+                    <span class="key-number-value">${formatCurrency(currentSavings)}</span>
+                </div>
+            `;
+
+            if (monthlyContribution > 0 && stopContributionAge < retirementAge) {
+                keyNumbersHTML += `
+                    <div class="key-number-row amber">
+                        <span class="key-number-label">Stop Contributing At:</span>
+                        <span class="key-number-value">Age ${stopContributionAge}</span>
+                    </div>
+                    <div class="key-number-row amber">
+                        <span class="key-number-label">Portfolio When You Stop:</span>
+                        <span class="key-number-value">${formatCurrency(portfolioAtStopAge)}</span>
+                    </div>
+                    <div class="key-number-row amber">
+                        <span class="key-number-label">Total You'll Contribute:</span>
+                        <span class="key-number-value">${formatCurrency(totalContributionsToStop)}</span>
+                    </div>
+                    <div class="key-number-row amber">
+                        <span class="key-number-label">Years of Coasting:</span>
+                        <span class="key-number-value">${retirementAge - stopContributionAge} years</span>
+                    </div>
+                `;
+            } else if (monthlyContribution > 0) {
+                keyNumbersHTML += `
+                    <div class="key-number-row amber">
+                        <span class="key-number-label">Monthly Contribution:</span>
+                        <span class="key-number-value">${formatCurrency(monthlyContribution)}</span>
+                    </div>
+                `;
+            }
+
+            keyNumbersHTML += `
+                <div class="divider"></div>
+                <div class="key-number-row highlight">
+                    <span class="key-number-label">At Retirement (no contributions):</span>
+                    <span class="key-number-value">${formatCurrency(futureValueNoContributions)}</span>
+                </div>
+            `;
+
+            if (monthlyContribution > 0) {
+                const futureValueLabel = stopContributionAge < retirementAge ? 
+                    `At Retirement (stop at ${stopContributionAge}):` : 
+                    'At Retirement (with contributions):';
+                    
+                keyNumbersHTML += `
+                    <div class="key-number-row highlight">
+                        <span class="key-number-label">${futureValueLabel}</span>
+                        <span class="key-number-value">${formatCurrency(futureValueWithStopAge)}</span>
+                    </div>
+                    <div class="key-number-row highlight" style="background-color: #d1fae5; border: 1px solid #10b981;">
+                        <span class="key-number-label">Benefit vs No Contributions:</span>
+                        <span class="key-number-value" style="color: #047857;">+${formatCurrency(futureValueWithStopAge - futureValueNoContributions)}</span>
+                    </div>
+                `;
+            }
+
+            keyNumbersHTML += `
+                <div class="key-number-row highlight">
+                    <span class="key-number-label">Required at Retirement:</span>
+                    <span class="key-number-value">${formatCurrency(requiredPortfolio)}</span>
+                </div>
+            `;
+
+            document.getElementById('keyNumbers').innerHTML = keyNumbersHTML;
+
+            // Generate projection data
+            const yearsAfterRetirement = 10;
+            const totalYears = yearsToRetirement + yearsAfterRetirement;
+            const projectionData = [];
+            const ages = [];
+            const withoutContribData = [];
+            const withStopData = [];
+            const requiredData = [];
+
+            let portfolioAtRetirementForWithdrawals;
+            if (monthlyContribution > 0) {
+                portfolioAtRetirementForWithdrawals = futureValueWithStopAge;
+            } else {
+                portfolioAtRetirementForWithdrawals = futureValueNoContributions;
+            }
+            const annualWithdrawal = portfolioAtRetirementForWithdrawals * (safeWithdrawalRate / 100);
+
+            for (let year = 0; year <= totalYears; year++) {
+                const age = currentAge + year;
+                const months = year * 12;
+                const isInRetirement = year > yearsToRetirement;
+
+                let portfolioNoContrib, portfolioWithStopAge;
+                let totalContributedSoFar = 0;
+
+                if (!isInRetirement) {
+                    portfolioNoContrib = currentSavings * Math.pow(1 + realReturn / 100, year);
+                    
+                    if (year <= yearsUntilStopContribution) {
+                        portfolioWithStopAge = currentSavings * Math.pow(1 + monthlyRealReturn, months) +
+                            monthlyContribution * ((Math.pow(1 + monthlyRealReturn, months) - 1) / monthlyRealReturn);
+                        totalContributedSoFar = monthlyContribution * months;
+                    } else {
+                        const yearsAfterStop = year - yearsUntilStopContribution;
+                        portfolioWithStopAge = portfolioAtStopAge * Math.pow(1 + realReturn / 100, yearsAfterStop);
+                        totalContributedSoFar = totalContributionsToStop;
+                    }
+                } else {
+                    const yearsIntoRetirement = year - yearsToRetirement;
+                    
+                    let portfolio = futureValueNoContributions;
+                    for (let i = 1; i <= yearsIntoRetirement; i++) {
+                        portfolio = portfolio * (1 + realReturn / 100) - annualWithdrawal;
+                        if (portfolio < 0) portfolio = 0;
+                    }
+                    portfolioNoContrib = portfolio;
+                    
+                    portfolio = portfolioAtRetirementForWithdrawals;
+                    for (let i = 1; i <= yearsIntoRetirement; i++) {
+                        portfolio = portfolio * (1 + realReturn / 100) - annualWithdrawal;
+                        if (portfolio < 0) portfolio = 0;
+                    }
+                    portfolioWithStopAge = portfolio;
+                    totalContributedSoFar = totalContributionsToStop;
+                }
+
+                const inflationFactor = Math.pow(1 + inflationRate / 100, year);
+                const portfolioNoContribNominal = portfolioNoContrib * inflationFactor;
+                
+                let portfolioWithStopNominal;
+                if (!isInRetirement && year <= yearsUntilStopContribution) {
+                    const nominalMonthlyReturn = Math.pow(1 + annualReturn / 100, 1/12) - 1;
+                    portfolioWithStopNominal = currentSavings * Math.pow(1 + nominalMonthlyReturn, months) +
+                        monthlyContribution * ((Math.pow(1 + nominalMonthlyReturn, months) - 1) / nominalMonthlyReturn);
+                } else {
+                    portfolioWithStopNominal = portfolioWithStopAge * inflationFactor;
+                }
+
+                const portfolioReal = monthlyContribution > 0 ? portfolioWithStopAge : portfolioNoContrib;
+                const portfolioNominal = monthlyContribution > 0 ? portfolioWithStopNominal : portfolioNoContribNominal;
+                const difference = portfolioNominal - portfolioReal;
+                const investmentGrowth = portfolioReal - currentSavings - totalContributedSoFar;
+                const annualIncomeReal = portfolioReal * (safeWithdrawalRate / 100);
+                const annualIncomeNominal = portfolioNominal * (safeWithdrawalRate / 100);
+
+                ages.push(age);
+                withoutContribData.push(Math.round(portfolioNoContrib));
+                withStopData.push(Math.round(portfolioWithStopAge));
+                requiredData.push(Math.round(requiredPortfolio));
+
+                projectionData.push({
+                    age,
+                    year: new Date().getFullYear() + year,
+                    portfolioReal: Math.round(portfolioReal),
+                    portfolioNominal: Math.round(portfolioNominal),
+                    difference: Math.round(difference),
+                    totalContributed: Math.round(totalContributedSoFar),
+                    investmentGrowth: Math.round(investmentGrowth),
+                    annualIncomeReal: Math.round(annualIncomeReal),
+                    annualIncomeNominal: Math.round(annualIncomeNominal),
+                    isStopAge: monthlyContribution > 0 && age === stopContributionAge,
+                    isRetirementAge: age === retirementAge,
+                    isInRetirement: isInRetirement
+                });
+            }
+
+            updateChart(ages, withoutContribData, withStopData, requiredData, monthlyContribution, stopContributionAge, retirementAge);
+            updateTable(projectionData, monthlyContribution, stopContributionAge);
+        }
+
+        function updateChart(ages, withoutContribData, withStopData, requiredData, monthlyContribution, stopContributionAge, retirementAge) {
+            const ctx = document.getElementById('portfolioChart').getContext('2d');
+
+            if (myChart) {
+                myChart.destroy();
+            }
+
+            const datasets = [
+                {
+                    label: 'Without Contributions',
+                    data: withoutContribData,
+                    borderColor: '#4f46e5',
+                    backgroundColor: 'rgba(79, 70, 229, 0.1)',
+                    borderWidth: 3,
+                    tension: 0.4
+                }
+            ];
+
+            if (monthlyContribution > 0) {
+                const label = stopContributionAge < retirementAge ? 
+                    `Stop Contributing at ${stopContributionAge}` : 
+                    'With Monthly Contributions';
+                    
+                datasets.push({
+                    label: label,
+                    data: withStopData,
+                    borderColor: '#f59e0b',
+                    backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                    borderWidth: 3,
+                    tension: 0.4
+                });
+            }
+
+            datasets.push({
+                label: 'Required for Retirement',
+                data: requiredData,
+                borderColor: '#dc2626',
+                backgroundColor: 'rgba(220, 38, 38, 0.1)',
+                borderWidth: 2,
+                borderDash: [5, 5],
+                tension: 0.4
+            });
+
+            myChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ages,
+                    datasets: datasets
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ' + formatCurrency(context.parsed.y);
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Age'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Portfolio Value'
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return '$' + (value / 1000).toFixed(0) + 'k';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateTable(projectionData, monthlyContribution, stopContributionAge) {
+            const tableBody = document.getElementById('tableBody');
+            const withdrawalRate = parseFloat(document.getElementById('safeWithdrawalRate').value) || 4;
+
+            const tableHeaders = document.querySelectorAll('#projectionTable thead th');
+            if (tableHeaders.length >= 8) {
+                tableHeaders[7].textContent = `Annual Income ${withdrawalRate}% (Today's $)`;
+                tableHeaders[8].textContent = `Annual Income ${withdrawalRate}% (Nominal)`;
+            }
+
+            let tableHTML = '';
+            projectionData.forEach(row => {
+                let rowClass = '';
+                if (row.isRetirementAge) {
+                    rowClass = 'retirement-row';
+                } else if (row.isInRetirement) {
+                    rowClass = 'stop-row';
+                } else if (row.isStopAge) {
+                    rowClass = 'stop-row';
+                }
+
+                tableHTML += `
+                    <tr class="${rowClass}">
+                        <td>
+                            ${row.age}
+                            ${row.isStopAge ? '<span style="color: #f59e0b; margin-left: 8px;">⚡</span>' : ''}
+                            ${row.isRetirementAge ? '<span style="color: #7c3aed; margin-left: 8px;">🎯</span>' : ''}
+                            ${row.isInRetirement && !row.isRetirementAge ? '<span style="color: #10b981; margin-left: 8px;">🏖️</span>' : ''}
+                        </td>
+                        <td style="color: #6b7280;">${row.year}</td>
+                        <td style="text-align: right; font-family: monospace;">${formatCurrency(row.portfolioReal)}</td>
+                        <td style="text-align: right; font-family: monospace;">${formatCurrency(row.portfolioNominal)}</td>
+                        <td style="text-align: right; font-family: monospace; color: #f59e0b;">${formatCurrency(row.difference)}</td>
+                        <td style="text-align: right; font-family: monospace; color: #6366f1;">${formatCurrency(row.totalContributed)}</td>
+                        <td style="text-align: right; font-family: monospace; color: #10b981;">${formatCurrency(row.investmentGrowth)}</td>
+                        <td style="text-align: right; font-family: monospace;">${formatCurrency(row.annualIncomeReal)}</td>
+                        <td style="text-align: right; font-family: monospace; color: #6b7280;">${formatCurrency(row.annualIncomeNominal)}</td>
+                    </tr>
+                `;
+            });
+
+            tableBody.innerHTML = tableHTML;
+        }
+
+        document.querySelectorAll('input').forEach(input => {
+            input.addEventListener('input', calculate);
+        });
+
+        calculate();
+    </script>
+</body>
+</html>
