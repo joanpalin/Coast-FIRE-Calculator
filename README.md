@@ -43,7 +43,7 @@ A comprehensive, free, and open-source Coast FIRE calculator that helps you unde
 ## 🚀 Quick Start
 
 ### Option 1: Use Online (Recommended)
-Visit the live calculator: **[https://joanpalin.github.io/coast-fire-calculator/](https://joanpalin.github.io/coast-fire-calculator/)**
+Visit the live calculator: **[https://joanpalin.github.io/coast-fire-calculator/](https://joanpalin.github.io/Coast-FIRE-Calculator/)**
 
 ### Option 2: Run Locally
 1. Clone this repository:
