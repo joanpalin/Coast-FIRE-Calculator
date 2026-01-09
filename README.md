@@ -33,6 +33,7 @@ A comprehensive, free, and open-source Coast FIRE calculator that helps you unde
 ## 📸 Preview
 
 ![Coast FIRE Calculator Screenshot](assets/images/screenshot.png)
+![Coast FIRE Calculator Screenshot](assets/images/screenshot1.png)
 
 *Interactive calculator with real-time projections, beautiful charts, and detailed year-by-year breakdowns*
 
